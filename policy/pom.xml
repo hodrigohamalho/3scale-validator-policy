@@ -20,12 +20,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>camel-quarkus-examples-timer-log-cdi</artifactId>
-    <groupId>org.apache.camel.quarkus.examples</groupId>
-    <version>2.2.0</version>
+    <artifactId>validator-policy</artifactId>
+    <groupId>com.redhat.lot</groupId>
+    <version>1.0.0</version>
 
-    <name>Camel Quarkus :: Examples :: Timer Log CDI</name>
-    <description>Camel Quarkus Example :: Timer to Log CDI</description>
+    <name>3Scale Validator Policy</name>
+    <description>Validates a request against a openapi schema</description>
 
     <properties>
         <camel-quarkus.version>2.2.0</camel-quarkus.version>
@@ -47,6 +47,7 @@
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <mycila-license.version>3.0</mycila-license.version>
+        <swagger-request-validator.version>2.18.1</swagger-request-validator.version>
     </properties>
 
     <dependencyManagement>
@@ -89,6 +90,11 @@
             <artifactId>apicurio-registry-common</artifactId>
             <version>${apicurio.registry.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.atlassian.oai</groupId>
+            <artifactId>swagger-request-validator-core</artifactId>
+            <version>${swagger-request-validator.version}</version>
+        </dependency>
 
         <!-- Test -->
         <dependency>
@@ -106,27 +112,6 @@
     <build>
         <pluginManagement>
             <plugins>
-
-                <plugin>
-                    <groupId>net.revelc.code.formatter</groupId>
-                    <artifactId>formatter-maven-plugin</artifactId>
-                    <version>${formatter-maven-plugin.version}</version>
-                    <configuration>
-                        <configFile>${maven.multiModuleProjectDirectory}/eclipse-formatter-config.xml</configFile>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>net.revelc.code</groupId>
-                    <artifactId>impsort-maven-plugin</artifactId>
-                    <version>${impsort-maven-plugin.version}</version>
-                    <configuration>
-                        <groups>java.,javax.,org.w3c.,org.xml.,junit.</groups>
-                        <removeUnused>true</removeUnused>
-                        <staticAfter>true</staticAfter>
-                        <staticGroups>java.,javax.,org.w3c.,org.xml.,junit.</staticGroups>
-                    </configuration>
-                </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

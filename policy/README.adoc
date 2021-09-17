@@ -55,6 +55,34 @@ $ ./target/*-runner
 ...
 ----
 
+==== Testing it locally
+
+To test using `curl` set the `http_proxy` environment variable, for example:
+
+    $ http_proxy=http://localhost:8000 curl -v http://echo-api.3scale.net
+
+==== Registry operator
+
+Deploy Postgres Database
+
+    username: postgres
+    pass: abc123
+    database: registry
+
+Install Registry Operator
+
+    apiVersion: apicur.io/v1alpha1
+    kind: ApicurioRegistry
+    metadata:
+    name: example-apicurioregistry
+    spec:
+    configuration:
+        persistence: "jpa"
+        dataSource:
+        url: "jdbc:postgresql://postgresql.demo.svc:5432/registry"
+        userName: "postgres"
+        password: "abc123"
+
 ==== 3Scale 
 
     docker run -it -p 8081:8080 -e THREESCALE_PORTAL_ENDPOINT=https://TOKEN@3scale-admin.apps.cluster-5f88.5f88.sandbox1482.opentlc.com registry.access.redhat.com/3scale-amp20/apicast-gateway:1.0

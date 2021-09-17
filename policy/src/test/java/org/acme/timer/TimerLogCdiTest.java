@@ -16,22 +16,24 @@
  */
 package org.acme.timer;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import static org.awaitility.Awaitility.await;
 
-import javax.enterprise.context.ApplicationScoped;
+import io.quarkus.test.junit.QuarkusTest;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.Test;
 
-/**
- * A counter bean.
- */
-@ApplicationScoped
-public class Counter {
-    private final AtomicInteger value = new AtomicInteger(0);
+@QuarkusTest
+public class TimerLogCdiTest {
 
-    public int increment() {
-        return value.incrementAndGet();
+    @Test
+    public void testTimerLog() {
+        await().atMost(10L, TimeUnit.SECONDS).pollDelay(1, TimeUnit.SECONDS).until(() -> {
+            String log = new String(Files.readAllBytes(Paths.get("target/quarkus.log")), StandardCharsets.UTF_8);
+            return log.contains("Incremented the counter");
+        });
     }
 
-    public int getValue() {
-        return value.get();
-    }
 }
