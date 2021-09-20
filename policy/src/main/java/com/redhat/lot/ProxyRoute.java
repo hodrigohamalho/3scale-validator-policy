@@ -8,7 +8,6 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -43,18 +42,19 @@ public class ProxyRoute extends RouteBuilder {
     @Override
     public void configure() throws Exception {
 
-        from("netty-http:proxy://0.0.0.0:8000").process(ProxyRoute::uppercase)
-                .toD("netty-http:" + "${headers." + Exchange.HTTP_SCHEME + "}://" + "${headers." + Exchange.HTTP_HOST
-                        + "}:" + "${headers." + Exchange.HTTP_PORT + "}" + "${headers." + Exchange.HTTP_PATH + "}")
-                .process(ProxyRoute::uppercase);
-
-        // from("timer:foo?repeatCount=1").process(ProxyRoute::uppercase);
+        from("netty-http:proxy://0.0.0.0:8000")
+            .process(ProxyRoute::uppercase)
+            .toD("netty-http:" 
+                + "${headers." + Exchange.HTTP_SCHEME + "}://" 
+                + "${headers." + Exchange.HTTP_HOST + "}:" 
+                + "${headers." + Exchange.HTTP_PORT + "}" 
+                + "${headers." + Exchange.HTTP_PATH + "}");
 
     }
 
     public static void uppercase(final Exchange exchange) {
         final OpenApiInteractionValidator validator = OpenApiInteractionValidator.createForSpecificationUrl(
-                "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/examples/v3.0/petstore-expanded.json")
+                "http://registry.demo.router-default.apps.cluster-8d57.8d57.sandbox1409.opentlc.com/api/artifacts/person")
                 // .withBasePathOverride("/")
                 .build();
 
@@ -62,47 +62,40 @@ public class ProxyRoute extends RouteBuilder {
         final FullHttpRequest request = _message.getHttpRequest();
         CustomRequest customRequest = new CustomRequest(request);
 
-        if (request == null) {
-            System.out.println("null prestou não...");
-        } else {
-            System.out.println("uri:" + request.uri());
-            System.out.println("method: " + request.method());
-            if (request.content() != null){
-                System.out.println("BODY: "+request.content().toString(CharsetUtil.UTF_8));
-            }
-            System.out.println("headers: ");
-            Iterator<Entry<String, String>> it = request.headers().iteratorAsString();
-            while (it.hasNext()) {
-                System.out.println("header -> " + it.next());
-            }
-            System.out.println("Começando a validação...");
+        if (request != null) {
+            ProxyRoute.debugRequest(request);
+            
+            System.out.println("Validating...");
             final ValidationReport report = validator.validateRequest(customRequest);
             if (report.hasErrors()) {
-                exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 403);
-                exchange.getIn().setHeader(Exchange.CONTENT_TYPE,  "text/plain");
-                exchange.getIn().setBody("Forbidden");
+                exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 400);
+                exchange.getIn().setHeader(Exchange.CONTENT_TYPE,  "application/json");
+                exchange.getIn().setBody("{ \"error\": \""+report.getMessages()+"\"");
+
                 for (ValidationReport.Message m : report.getMessages()) {
                     System.out.println("Error: " + m);
-                    final FullHttpResponse response = _message.getHttpResponse();
-                    if (response != null){
-                        response.setStatus(HttpResponseStatus.BAD_REQUEST);
-                    }
                 }
-            } else {
-                System.out.println("converting message");
-                final Message message = exchange.getIn();
-                final String body = message.getBody(String.class);
-                message.setBody(body.toUpperCase(Locale.US));
-                System.out.println("message converted");
             }
         }
+        
+        System.out.println("converting message");
+        final Message message = exchange.getIn();
+        final String body = message.getBody(String.class);
+        message.setBody(body.toUpperCase(Locale.US));
+        System.out.println("message converted");
+    }
 
-        // String registryUrl = "http://registry.demo.router-default.apps.cluster-5f88.5f88.sandbox1482.opentlc.com";
-        // RegistryClient client = RegistryClientFactory.create(registryUrl);
-
-        // ArtifactMetaData oas = getSchemaFromRegistry(client, "petstore");
-        // System.out.println("Get the OAS: " + oas.getId());
-
+    public static void debugRequest(FullHttpRequest req){
+        System.out.println("uri:" + req.uri());
+        System.out.println("method: " + req.method());
+        if (req.content() != null){
+            System.out.println("BODY: "+req.content().toString(CharsetUtil.UTF_8));
+        }
+        System.out.println("headers: ");
+        Iterator<Entry<String, String>> it = req.headers().iteratorAsString();
+        while (it.hasNext()) {
+            System.out.println("header -> " + it.next());
+        }
     }
 
     public static ArtifactMetaData getSchemaFromRegistry(RegistryClient client, String artifactId) {

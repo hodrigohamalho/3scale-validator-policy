@@ -3,7 +3,7 @@ package com.redhat.lot;
 import com.atlassian.oai.validator.model.Request;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.CharsetUtil;
-
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -55,12 +55,12 @@ public class CustomRequest implements Request {
             }
         }
 
-        System.out.println("Lista de query parameters: ");
+        System.out.println("Query Parameters List: ");
         for (String s : qp) {
             System.out.println(s);
         }
 
-        System.out.println("Lista de query no hashmap: ");
+        System.out.println("Query Parameters hashmap: ");
         for (Map.Entry<String, String> entry : qps.entrySet()) {
             System.out.println("key: " + entry.getKey() + "value: " + entry.getValue());
         }
@@ -87,7 +87,16 @@ public class CustomRequest implements Request {
 
     @Override
     public String getPath() {
-        return request.uri();
+        String path = "";
+        try{
+            URL url = new URL(request.uri());
+            path = url.getPath();
+            System.out.println("PATH: "+path);
+        }catch(java.net.MalformedURLException e){
+            e.printStackTrace();
+        }
+
+        return path;
     }
 
     @Override

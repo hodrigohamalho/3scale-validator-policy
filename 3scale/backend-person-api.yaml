@@ -1,0 +1,26 @@
+apiVersion: capabilities.3scale.net/v1beta1
+kind: Backend
+metadata:
+  name: person
+spec:
+  name: "person"
+  privateBaseURL: "http://person.demo.svc:8080/person"
+  methods:
+    person:
+      friendlyName: person
+    person_id:
+      friendlyName: person by id
+  mappingRules:
+    - httpMethod: GET
+      pattern: "/person"
+      increment: 1
+      metricMethodRef: person
+    - httpMethod: GET
+      pattern: "/person/{id}"
+      increment: 1
+      metricMethodRef: person_id
+  metrics:
+    hits:
+      description: Number of API hits
+      friendlyName: Hits
+      unit: "hit"

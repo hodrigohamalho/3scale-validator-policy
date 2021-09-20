@@ -1,0 +1,67 @@
+---
+openapi: 3.0.3
+info:
+  title: Person API
+  version: 1.0.0
+paths:
+  /person:
+    get:
+      parameters:
+      - name: delay
+        in: query
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+      responses:
+        "200":
+          description: OK
+  /person/{id}:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: delay
+        in: query
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    Person:
+      type: object
+      properties:
+        age:
+          format: int32
+          type: integer
+        city:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        state:
+          type: string

@@ -1,0 +1,9 @@
+= 3Scale Validator Policy
+
+Deploy person-api 
+
+    oc new-app openjdk-11-el7~https://github.com/hodrigohamalho/3scale-validator-policy.git \
+        --context-dir=person-api \
+        --strategy=source \
+        --name=person-api
+
