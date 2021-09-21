@@ -1,6 +1,7 @@
 package com.redhat.lot;
 
 import com.atlassian.oai.validator.model.Request;
+
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.CharsetUtil;
 import java.net.*;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CustomRequest implements Request {
 
@@ -19,9 +22,9 @@ public class CustomRequest implements Request {
     private Map<String, Collection<String>> headers = new HashMap<>();
     private List<String> qp = new ArrayList<>();
     private Map<String, String> qps = new HashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomRequest.class);
 
-    CustomRequest() {
-    }
+    CustomRequest() {}
 
     CustomRequest(FullHttpRequest fullReq) {
         if (fullReq != null){
@@ -55,14 +58,14 @@ public class CustomRequest implements Request {
             }
         }
 
-        System.out.println("Query Parameters List: ");
+        LOGGER.info("Query Parameters List: ");
         for (String s : qp) {
-            System.out.println(s);
+            LOGGER.info(s);
         }
 
-        System.out.println("Query Parameters hashmap: ");
+        LOGGER.info("Query Parameters hashmap: ");
         for (Map.Entry<String, String> entry : qps.entrySet()) {
-            System.out.println("key: " + entry.getKey() + "value: " + entry.getValue());
+            LOGGER.info("key: " + entry.getKey() + "value: " + entry.getValue());
         }
     }
 
@@ -91,7 +94,7 @@ public class CustomRequest implements Request {
         try{
             URL url = new URL(request.uri());
             path = url.getPath();
-            System.out.println("PATH: "+path);
+            LOGGER.info("PATH: "+path);
         }catch(java.net.MalformedURLException e){
             e.printStackTrace();
         }
