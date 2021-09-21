@@ -1,0 +1,9 @@
+apiVersion: apps.3scale.net/v1alpha1
+kind: APIManager
+metadata:
+  name: 3scale
+spec:
+  wildcardDomain: apps.cluster-8d57.8d57.sandbox1409.opentlc.com
+  resourceRequirementsEnabled: false
+  monitoring:
+    enabled: true
